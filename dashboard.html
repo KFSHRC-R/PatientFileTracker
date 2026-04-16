@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial; margin:0; background:#f5f7fa;}
+    .header { background:#1e7e34; padding:15px; text-align:center; }
+    .header img { max-width:200px; }
+    h2 { text-align:center; margin-top:20px;}
+    input { padding:10px; width:300px; margin:20px;}
+    table { width:90%; margin:auto; border-collapse:collapse; background:white;}
+    th, td { border:1px solid #ddd; padding:10px; }
+    th { background:#1e7e34; color:white; }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+  <img src="logo.png">
+</div>
+
+<h2>Patient Tracking Dashboard</h2>
+
+<center>
+<input type="text" id="search" placeholder="Search...">
+</center>
+
+<table>
+<thead>
+<tr>
+<th>Room</th>
+<th>MRN</th>
+<th>Transaction</th>
+<th>Paper</th>
+<th>Staff ID</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const tableBody = document.getElementById("tableBody");
+
+onSnapshot(collection(db, "logs"), (snapshot) => {
+  tableBody.innerHTML = "";
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    tableBody.innerHTML += `
+      <tr>
+        <td>${d.room}</td>
+        <td>${d.mrn}</td>
+        <td>${d.transaction}</td>
+        <td>${d.paper}</td>
+        <td>${d.staff}</td>
+        <td>${d.time}</td>
+      </tr>`;
+  });
+});
+
+document.getElementById("search").addEventListener("input", function(){
+  const value = this.value.toLowerCase();
+  document.querySelectorAll("tbody tr").forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+  });
+});
+</script>
+
+</body>
+</html>
